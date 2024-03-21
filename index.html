@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Generic Table Editor</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.11/tinymce.min.js"></script>
+  <script src="https://app.kontent.ai/js-api/custom-element/v1/custom-element.min.js"></script>
+
+  <script>
+    CustomElement.init((element, context) => {
+      console.log(context.projectId);
+      CustomElement.setHeight(500);
+      element.disabled = false;
+
+      tinymce.init({
+        selector: 'textarea',
+        setup: function (ed) {
+          ed.on('init', function () {
+            // Get the initial content from the Custom Element and set it in TinyMCE
+            const initialContent = element.value;
+            console.log('init value in callback', initialContent);
+            tinymce.activeEditor.setContent(initialContent);
+          });
+
+          ed.on("keyup change", function () {
+            let content = tinymce.activeEditor.getContent();
+            console.log("content", content);
+            CustomElement.setValue(content);
+
+            const textarea = document.getElementById('table'); // Correct the ID
+            const textareaHeight = textarea.scrollHeight;
+            console.log("Textarea height:", textareaHeight);
+
+            // Update the height of the custom element based on the textarea's scrollHeight
+            CustomElement.setHeight(500 + textareaHeight);
+          });
+        },
+        content_css: ['base.css', 'generic-tables.css'],
+        plugins: 'table autoresize code contextmenu nonbreaking paste visualchars',
+        menubar: false,
+        toolbar: 'newdocument | table tablerowprops tablecellprops tablemergecells | alignnone alignright bold styleselect | nonbreaking visualchars | preparetable code',
+        table_toolbar: 'tablerowprops tablecellprops tablemergecells | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
+        contextmenu: 'tableprops cell row column',
+        autoresize_max_height: 600,
+        formats: {
+          alignright: { selector: 'td,th', classes: 'numeric' },
+        },
+        style_formats: [
+          { title: 'Visually hidden text', inline: 'span', classes: 'visuallyhidden' },
+        ],
+        valid_elements: 'table[class|id|style|border],caption,col[class|style],colgroup[span|class|style],thead[class|style],tbody[class|style],tfoot[class|style],tr[class|style],td[scope|colspan|rowspan|class|style],th[scope|colspan|rowspan|class|style],strong,span[class|style],abbr[title],br',
+        forced_root_block: false,
+        table_grid: false,
+        table_advtab: false,
+        table_cell_advtab: false,
+        table_row_advtab: false,
+      });
+    });
+  </script>
+
+  <link rel="stylesheet" type="text/css" href="base.css" />
+</head>
+
+<body>
+  <noscript>Sorry, this editor only works with JavaScript.</noscript>
+
+  <textarea id="table"></textarea>
+</body>
+
+</html>
